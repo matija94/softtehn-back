@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,6 +20,14 @@ public class TemplateController {
     @GetMapping(Urls.TEMPLATE)
     public ResponseEntity<List<Template>> getTemplates(@AuthenticationPrincipal UserPrincipal principal) {
         return new ResponseEntity(templateService.findByGroup(principal.getUser().getGroup()), HttpStatus.OK);
+    }
+
+    @GetMapping(Urls.TEMPLATE_BY_NAME)
+    public ResponseEntity<Template> getTemplateByName(@AuthenticationPrincipal UserPrincipal principal,
+                                                      @PathVariable("name") String name) {
+        Template template = templateService.findDocumentsByGroupAndTemplateName(principal.getUser().getGroup(),
+                name);
+        return new ResponseEntity<>(template, HttpStatus.OK);
     }
 
     @PostMapping(Urls.TEMPLATE)

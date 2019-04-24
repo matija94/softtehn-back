@@ -24,6 +24,9 @@ public class TemplateService {
         return templateRepository.findByGroupID(group.getGroupId());
     }
 
+    public Template findDocumentsByGroupAndTemplateName(Group group, String templateName) {
+        return templateRepository.findByGroupIDAndTemplateName(group.getGroupId(), templateName);
+    }
     public List<Template> findAll() {
         return templateRepository.findAll();
     }
