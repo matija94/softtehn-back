@@ -29,24 +29,26 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String jwt = getJWTFromRequest(request);
+        if (!request.getRequestURL().toString().contains("login")) {
+            try {
+                String jwt = getJWTFromRequest(request);
 
-            if (StringUtils.hasText(jwt)) {
-                String email = tokenValidator.validateToken(jwt);
-                if (email == null) {
-                    throw new Exception();
+                if (StringUtils.hasText(jwt)) {
+                    String email = tokenValidator.validateToken(jwt);
+                    if (email == null) {
+                        throw new Exception();
+                    }
+                    UserDetails userDetails = userDetailService.loadUserByUsername(email);
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+                            userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
-                UserDetails userDetails = userDetailService.loadUserByUsername(email);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
-                        userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } catch (Exception ex) {
+                logger.error("Could not set user authentication in security context", ex);
             }
-
-        } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
         }
 
         filterChain.doFilter(request, response);

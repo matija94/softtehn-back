@@ -1,5 +1,7 @@
 package com.matija.softtehn.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -20,6 +22,7 @@ public class User {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "group_id")
+    @JsonIgnore
     private Group group;
 
     @Column
