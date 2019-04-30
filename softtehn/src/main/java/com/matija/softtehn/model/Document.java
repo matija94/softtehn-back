@@ -1,9 +1,11 @@
 package com.matija.softtehn.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.matija.softtehn.model.converters.MapToJsonConverter;
 import com.matija.softtehn.model.embeddables.DateTime;
 
 import javax.persistence.*;
+import java.util.Map;
 
 @Entity
 public class Document {
@@ -12,14 +14,13 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long documentId;
 
-    @Transient
     private String templateName;
 
     @Embedded
     private DateTime dateTime;
 
-    @Column
-    private String data;
+    @Convert(converter = MapToJsonConverter.class)
+    private Map<String, Object> data;
 
     @ManyToOne
     @JoinColumn(name = "template_id")
@@ -29,7 +30,7 @@ public class Document {
     public Document() {
     }
 
-    public Document(DateTime dateTime, String data) {
+    public Document(DateTime dateTime, Map<String, Object> data) {
         this.dateTime = dateTime;
         this.data = data;
     }
@@ -50,11 +51,11 @@ public class Document {
         this.dateTime = dateTime;
     }
 
-    public String getData() {
+    public Map<String, Object> getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(Map<String, Object> data) {
         this.data = data;
     }
 
