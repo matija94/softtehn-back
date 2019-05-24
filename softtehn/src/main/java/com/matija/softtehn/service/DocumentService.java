@@ -20,6 +20,9 @@ public class DocumentService {
     @Autowired
     private TemplateRepository templateRepository;
 
+    @Autowired
+    private FileStorageService fss;
+
     public Document createDocument(Document document) {
         DateTime dateTime = DateTime.createDateTime();
         Template template = templateRepository.findByName(document.getTemplateName());
@@ -32,5 +35,9 @@ public class DocumentService {
     public List<Document> findDocumentsByGroupAndTemplateName(Group group, String templateName) {
         Template template = templateRepository.findByGroupIDAndTemplateName(group.getGroupId(), templateName);
         return documentRepository.findDocumensByTemplateId(template.getTemplateId());
+    }
+
+    public Document getDocument(Long id) {
+        return documentRepository.getOne(id);
     }
 }

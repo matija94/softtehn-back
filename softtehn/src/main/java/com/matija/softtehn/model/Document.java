@@ -3,6 +3,7 @@ package com.matija.softtehn.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.matija.softtehn.model.converters.MapToJsonConverter;
 import com.matija.softtehn.model.embeddables.DateTime;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.Map;
@@ -19,6 +20,8 @@ public class Document {
     @Embedded
     private DateTime dateTime;
 
+    private String fileName;
+
     @Convert(converter = MapToJsonConverter.class)
     private Map<String, Object> data;
 
@@ -30,9 +33,10 @@ public class Document {
     public Document() {
     }
 
-    public Document(DateTime dateTime, Map<String, Object> data) {
+    public Document(DateTime dateTime, Map<String, Object> data, String fileName) {
         this.dateTime = dateTime;
         this.data = data;
+        this.fileName = fileName;
     }
 
     public long getDocumentId() {
@@ -73,5 +77,13 @@ public class Document {
 
     public void setTemplateName(String templateName) {
         this.templateName = templateName;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }
