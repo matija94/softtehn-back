@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -64,6 +65,16 @@ public class FileStorageService {
             }
         } catch (MalformedURLException ex) {
             throw new RuntimeException("File not found " + fileName, ex);
+        }
+    }
+
+    public byte[] loadFileAsBytes(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            return Files.readAllBytes(filePath);
+        }
+         catch (IOException e) {
+            throw new RuntimeException("File not found " + fileName);
         }
     }
 }

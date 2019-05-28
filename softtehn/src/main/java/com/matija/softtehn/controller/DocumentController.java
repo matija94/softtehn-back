@@ -5,7 +5,6 @@ import com.matija.softtehn.model.UserPrincipal;
 import com.matija.softtehn.service.DocumentService;
 import com.matija.softtehn.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,13 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 @RestController
+@CrossOrigin(value = {"*"}, exposedHeaders = {"Content-Disposition"})
 public class DocumentController {
 
     @Autowired
@@ -50,24 +46,15 @@ public class DocumentController {
     }
 
     @GetMapping(Urls.DOCUMENT_FILE_BY_ID)
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long id, HttpServletRequest request){
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long id){
         Document document = documentService.getDocument(id);
-        Resource resource = fss.loadFileAsResource(document.getFileName());
+        byte[] data = fss.loadFileAsBytes(document.getFileName());
 
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            System.out.println("Could not determine file type.");
-        }
-
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.valueOf("application/pdf"));
+        header.setContentLength(data.length);
+        header.set("Content-Disposition", "inline;filename=" + document.getFileName());
+        return new ResponseEntity<>(data, header, HttpStatus.OK);
     }
 
 
